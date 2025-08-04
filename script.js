@@ -12,6 +12,21 @@ function fileSubmit() {
 function handle(contents) {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(contents, "text/xml");
+  const BaseStatsJSON = BaseStats(xmlDoc);
+  const AreaStatsJSON = AreaStats(xmlDoc);
+  let JSON = { ...BaseStatsJSON, ...AreaStatsJSON };
+  let KVP = [];
+  const K = Object.keys(JSON);
+  const V = Object.values(JSON);
+  for (let i = 0; i < K.length; i++) {
+    KVP.push([K[i], V[i]]);
+  }
+  console.log(KVP);
+  console.log(K, V);
+  document.getElementById("output").innerHTML = `Stats: ${KVP}`;
+}
+
+function BaseStats(xmlDoc) {
   const importantInfo = [
     "Name",
     "Time",
@@ -23,26 +38,70 @@ function handle(contents) {
     "TotalDashes",
   ];
   let JSON = {};
-  for (id of importantInfo) {
+  for (const id of importantInfo) {
     JSON[id] = xmlDoc.getElementsByTagName(id)[0].childNodes[0].nodeValue;
   }
+  return JSON;
+}
+
+function AreaStats(xmlDoc) {
+  const Areas = xmlDoc.getElementsByTagName("Areas")[0];
+  const allAreaStats = Areas.getElementsByTagName("AreaStats");
+  let JSON = {};
+  for (const areaStat of allAreaStats) {
+    const id = areaStat.getAttribute("ID");
+    let chapter = "";
+    if (id == 0) {
+      chapter = "Prologue";
+    } else if (id > 0 && id < 8) {
+      chapter = `${id}`;
+    } else if (id == 8) {
+      chapter = "Epilogue";
+    } else if (id > 8) {
+      chapter = `${id - 1}`;
+    }
+    const areamodestats = areaStat.getElementsByTagName("AreaModeStats");
+    const A = areamodestats[0];
+    const B = areamodestats[1];
+    const C = areamodestats[2];
+    const AsideStats = {
+      Strawbs: A.getAttribute("TotalStrawberries"),
+      Completed: A.getAttribute("Completed"),
+      Deaths: A.getAttribute("Deaths"),
+      Time: A.getAttribute("TimePlayed"),
+      BestTime: A.getAttribute("BestTime"),
+      BestDashes: A.getAttribute("BestDashes"),
+      BestDeaths: A.getAttribute("BestDeaths"),
+      HeartGem: A.getAttribute("HeartGem"),
+    };
+    const BsideStats = {
+      Strawbs: B.getAttribute("TotalStrawberries"),
+      Completed: B.getAttribute("Completed"),
+      Deaths: B.getAttribute("Deaths"),
+      Time: B.getAttribute("TimePlayed"),
+      BestTime: B.getAttribute("BestTime"),
+      BestDashes: B.getAttribute("BestDashes"),
+      BestDeaths: B.getAttribute("BestDeaths"),
+      HeartGem: B.getAttribute("HeartGem"),
+    };
+    const CsideStats = {
+      Strawbs: C.getAttribute("TotalStrawberries"),
+      Completed: C.getAttribute("Completed"),
+      Deaths: C.getAttribute("Deaths"),
+      Time: C.getAttribute("TimePlayed"),
+      BestTime: C.getAttribute("BestTime"),
+      BestDashes: C.getAttribute("BestDashes"),
+      BestDeaths: C.getAttribute("BestDeaths"),
+      HeartGem: C.getAttribute("HeartGem"),
+    };
+    JSON[id] = {
+      Chapter: chapter,
+      Cassette: areaStat.getAttribute("Cassette"),
+      A: AsideStats,
+      B: BsideStats,
+      C: CsideStats,
+    };
+  }
   console.log(JSON);
-  document.getElementById("output").innerHTML = `Stats: ${[
-    "Name",
-    JSON.Name,
-    "Time",
-    JSON.Time,
-    "TotalDeaths",
-    JSON.TotalDeaths,
-    "TotalStrawberries",
-    JSON.TotalStrawberries,
-    "TotalGoldenStrawberries",
-    JSON.TotalGoldenStrawberries,
-    "TotalJumps",
-    JSON.TotalJumps,
-    "TotalWallJumps",
-    JSON.TotalWallJumps,
-    "TotalDashes",
-    JSON.TotalDashes,
-  ]}`;
+  return JSON;
 }
