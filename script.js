@@ -14,16 +14,20 @@ function handle(contents) {
   const xmlDoc = parser.parseFromString(contents, "text/xml");
   const BaseStatsJSON = BaseStats(xmlDoc);
   const AreaStatsJSON = AreaStats(xmlDoc);
-  let JSON = { ...BaseStatsJSON, ...AreaStatsJSON };
+  let JSoN = { ...BaseStatsJSON, ...AreaStatsJSON };
   let KVP = [];
-  const K = Object.keys(JSON);
-  const V = Object.values(JSON);
+  const K = Object.keys(JSoN);
+  const V = Object.values(JSoN);
   for (let i = 0; i < K.length; i++) {
     KVP.push([K[i], V[i]]);
   }
   console.log(KVP);
   console.log(K, V);
-  document.getElementById("output").innerHTML = `Stats: ${KVP}`;
+  document.getElementById("output").innerHTML = `Stats: ${JSON.stringify(
+    JSoN,
+    null,
+    2
+  )}`;
 }
 
 function BaseStats(xmlDoc) {
