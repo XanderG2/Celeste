@@ -47,11 +47,12 @@ function BaseStats(xmlDoc) {
     JSON.important[spaces] =
       xmlDoc.getElementsByTagName(id)[0].childNodes[0].nodeValue;
   }
-  JSON.important.Time = msToTime(JSON.important.Time / 10000);
+  JSON.important.Time = timeToTime(JSON.important.Time);
   return JSON;
 }
 
-function msToTime(duration) {
+function timeToTime(durationU) {
+  let duration = durationU / 10000;
   let milliseconds = duration % 1000;
   let seconds = Math.floor((duration / 1000) % 60);
   let minutes = Math.floor((duration / (1000 * 60)) % 60);
@@ -90,7 +91,7 @@ function AreaStats(xmlDoc) {
       Strawberries: A.getAttribute("TotalStrawberries"),
       Completed: A.getAttribute("Completed"),
       Deaths: A.getAttribute("Deaths"),
-      Time: msToTime(A.getAttribute("TimePlayed") / 1000),
+      Time: timeToTime(A.getAttribute("TimePlayed")),
       BestTime: A.getAttribute("BestTime"),
       BestDashes: A.getAttribute("BestDashes"),
       BestDeaths: A.getAttribute("BestDeaths"),
@@ -99,7 +100,7 @@ function AreaStats(xmlDoc) {
     const BsideStats = {
       Completed: B.getAttribute("Completed"),
       Deaths: B.getAttribute("Deaths"),
-      Time: msToTime(B.getAttribute("TimePlayed") / 1000),
+      Time: timeToTime(B.getAttribute("TimePlayed")),
       BestTime: B.getAttribute("BestTime"),
       BestDashes: B.getAttribute("BestDashes"),
       BestDeaths: B.getAttribute("BestDeaths"),
@@ -108,7 +109,7 @@ function AreaStats(xmlDoc) {
     const CsideStats = {
       Completed: C.getAttribute("Completed"),
       Deaths: C.getAttribute("Deaths"),
-      Time: msToTime(C.getAttribute("TimePlayed") / 1000),
+      Time: timeToTime(C.getAttribute("TimePlayed")),
       BestTime: C.getAttribute("BestTime"),
       BestDashes: C.getAttribute("BestDashes"),
       BestDeaths: C.getAttribute("BestDeaths"),
