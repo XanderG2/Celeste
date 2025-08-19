@@ -38,7 +38,13 @@ function BaseStats(xmlDoc) {
   ];
   let JSON = { important: {} };
   for (const id of importantInfo) {
-    JSON.important[id] =
+    const spaces = (
+      id
+        .replace(/([A-Z])/g, " $1")
+        .charAt(0)
+        .toUpperCase() + id.replace(/([A-Z])/g, " $1").slice(1)
+    ).trim();
+    JSON.important[spaces] =
       xmlDoc.getElementsByTagName(id)[0].childNodes[0].nodeValue;
   }
   JSON.important.Time = msToTime(JSON.important.Time / 10000);
