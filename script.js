@@ -77,11 +77,11 @@ function AreaStats(xmlDoc) {
     if (id == 0) {
       chapter = "Prologue";
     } else if (id > 0 && id < 8) {
-      chapter = `${id}`;
+      chapter = `Chapter ${id}`;
     } else if (id == 8) {
       chapter = "Epilogue";
     } else if (id > 8) {
-      chapter = `${id - 1}`;
+      chapter = `Chapter ${id - 1}`;
     }
     const areamodestats = areaStat.getElementsByTagName("AreaModeStats");
     const A = areamodestats[0];
@@ -147,4 +147,16 @@ function pretty(stats) {
   importantFieldset.appendChild(div1);
   importantFieldset.appendChild(div2);
   outputDiv.appendChild(importantFieldset);
+  delete stats.important;
+  Object.keys(stats).forEach((chapterId) => {
+    const chapter = stats[chapterId];
+    console.log(chapter);
+    const chapterDiv = document.createElement("div");
+    if (chapter.A.Completed == "true") {
+      chapterDiv.innerHTML = `<h1>${chapter.Chapter}</h1><div></div>`;
+    } else {
+      chapterDiv.innerHTML = `${chapter.Chapter} Not Completed`;
+    }
+    outputDiv.appendChild(chapterDiv);
+  });
 }
