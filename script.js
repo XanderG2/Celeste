@@ -1,14 +1,47 @@
+// @ts-check
+
+/**
+ * * Runs upon submission of a file
+ * * Finds file, and passes it off to handle
+ * @returns {void}
+ */
 function fileSubmit() {
-  //* Runs upon submission of a file
-  //TODO: explain
-  const input = document.getElementById("file");
-  const file = input.files[0];
+  /** @type {HTMLInputElement | null} */
+  const input = document.querySelector('input[type="file"]'); // The Choose file button
+
+  if (input == null) {
+    console.error("Could not find input button!");
+    return;
+  }
+
+  /** @type {FileList | null} */
+  const chosenFiles = input.files; // The user-selected file(s)
+
+  if (chosenFiles == null) {
+    console.error("No submitted file!"); // Can't read no files
+    return;
+  }
+
+  if (chosenFiles.length !== 1) {
+    console.error("Should be 1 file submitted!"); // Can't read 2 files
+    return;
+  }
+
+  const file = chosenFiles[0]; // There is only one file, so the file will always be the first item
+
   const reader = new FileReader();
-  reader.onload = function () {
-    const contents = reader.result;
+  reader.onload = () => {
+    const contents = reader.result; // The contents of the file
+
+    if (typeof contents !== "string") {
+      console.error("Contents should be a string!");
+      return;
+    }
+
     const KVP = handle(contents);
-    pretty(KVP);
+    pretty(KVP); // Display on webpage
   };
+
   reader.readAsText(file);
 }
 
