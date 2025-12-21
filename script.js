@@ -70,7 +70,6 @@ function handle(contents) {
  */
 
 function µsToTime(durationUStr) {
-  021;
   const durationU = durationUStr != null ? parseFloat(durationUStr) : 0;
   let duration = durationU / 10000;
   let milliseconds = duration % 1000;
