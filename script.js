@@ -252,11 +252,17 @@ function pretty(stats) {
 
     let chapterHTML = `<h1 style='cursor:pointer;' onclick='toggle("${chapter.Chapter.replace(/ /g, "")}")'>${
       chapter.Chapter
-    }</h1><div style='display:none;' id='${chapter.Chapter.replace(/ /g, "")}'>`;
+    }</h1><div style='display:none;' id='${chapter.Chapter.replace(
+      / /g,
+      ""
+    )}'><div style='display:flex;justify-content: space-around;'>`;
 
-    if (chapter.A.Completed !== "true") {
-      chapterDiv.innerHTML += `<p>${chapter.Chapter} not complete.</p>`;
-    }
+    if (chapter.B.HeartGem == "true") chapterHTML += "<img src='redHeart.png'/>";
+    if (chapter.A.HeartGem == "true") chapterHTML += "<img src='blueHeart.png'/>";
+    if (chapter.C.HeartGem == "true") chapterHTML += "<img src='goldHeart.png'/>";
+    chapterHTML += "</div>";
+
+    if (chapter.A.Completed !== "true") chapterDiv.innerHTML += `<p>${chapter.Chapter} not complete.</p>`;
 
     let infoDiv = '<div class="info">';
     const special = chapter.Chapter[0] !== "C"; // Check if the chapter is prologue or epilogue
