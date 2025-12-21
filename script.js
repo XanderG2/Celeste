@@ -70,6 +70,7 @@ function handle(contents) {
  */
 
 function µsToTime(durationUStr) {
+  021;
   const durationU = durationUStr != null ? parseFloat(durationUStr) : 0;
   let duration = durationU / 10000;
   let milliseconds = duration % 1000;
@@ -127,7 +128,7 @@ function getStats(side) {
     Completed: side.getAttribute("Completed") ?? "",
     Deaths: side.getAttribute("Deaths") ?? "",
     Time: µsToTime(side.getAttribute("TimePlayed")) ?? "",
-    BestTime: side.getAttribute("BestTime") ?? "",
+    BestTime: µsToTime(side.getAttribute("BestTime")) ?? "",
     BestDashes: side.getAttribute("BestDashes") ?? "",
     BestDeaths: side.getAttribute("BestDeaths") ?? "",
     HeartGem: side.getAttribute("HeartGem") ?? "",
@@ -229,7 +230,20 @@ function pretty(stats) {
 
     const infoDiv = document.createElement("div");
     infoDiv.className = "info";
-    infoDiv.innerHTML += ``; //TODO: add stats
+    const special = chapter.Chapter[0] !== "C"; // Check if the chapter is prologue or epilogue
+    if (!special) {
+      if (chapter.A.Completed == "true") {
+        infoDiv.innerHTML += `<fieldset><legend>Side A</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${chapter.A.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${chapter.A.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${chapter.A.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${chapter.A.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${chapter.A.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${chapter.A.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${chapter.A.BestDashes}</div></div></fieldset><br/>`;
+      }
+      if (chapter.B.Completed == "true") {
+        infoDiv.innerHTML += `<fieldset><legend>Side B</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${chapter.B.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${chapter.B.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${chapter.B.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${chapter.B.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${chapter.B.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${chapter.B.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${chapter.B.BestDashes}</div></div></fieldset><br/>`;
+      }
+      if (chapter.C.Completed == "true") {
+        infoDiv.innerHTML += `<fieldset><legend>Side C</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${chapter.C.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${chapter.C.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${chapter.C.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${chapter.C.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${chapter.C.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${chapter.C.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${chapter.C.BestDashes}</div></div></fieldset>`;
+      }
+    } else {
+      infoDiv.innerHTML += `<fieldset><legend>${chapter.Chapter}</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${chapter.A.Deaths}</div><div style="margin:auto"><h3>Time</h3>${chapter.A.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${chapter.A.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${chapter.A.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${chapter.A.BestDashes}</div></div></fieldset>`;
+    }
 
     chapterDiv.appendChild(infoDiv);
     outputDiv.appendChild(chapterDiv);
