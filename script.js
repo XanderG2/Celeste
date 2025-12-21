@@ -200,11 +200,11 @@ function toggle(id) {
 /**
  * * Self explanatory.
  * @param {ChapterStats["A"]} side
- * @param {string} chapter
+ * @param {string} sideName - Either Prologue, Epilogue, A, B, or C
  */
 
-function generateHTMLForSides(side, chapter) {
-  return `<fieldset><legend>${chapter}</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${side.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${side.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${side.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${side.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${side.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${side.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${side.BestDashes}</div></div></fieldset><br/>`;
+function generateHTMLForSides(side, sideName) {
+  return `<fieldset><legend>${sideName}</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${side.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${side.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${side.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${side.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${side.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${side.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${side.BestDashes}</div></div></fieldset><br/>`;
 }
 
 /**
