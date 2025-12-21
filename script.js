@@ -179,11 +179,11 @@ function chapterStat(areaStat) {
 }
 
 /**
- * * show a section
+ * * Toggle a section
  * @param {string} id
  */
 
-function show(id) {
+function toggle(id) {
   const el = document.getElementById(id);
   if (el == null) return;
   const prevStyle = el.style.cssText;
@@ -240,7 +240,7 @@ function pretty(stats) {
     const chapterDiv = document.createElement("div");
     chapterDiv.className = "chapterDiv";
 
-    let chapterHTML = `<h1 style='cursor:pointer;' onclick='show("${chapter.Chapter.replace(/ /g, "")}")'>${
+    let chapterHTML = `<h1 style='cursor:pointer;' onclick='toggle("${chapter.Chapter.replace(/ /g, "")}")'>${
       chapter.Chapter
     }</h1><div style='display:none;' id='${chapter.Chapter.replace(/ /g, "")}'>`;
 
