@@ -179,6 +179,25 @@ function chapterStat(areaStat) {
 }
 
 /**
+ * * show a section
+ * @param {string} id
+ */
+
+function show(id) {
+  const el = document.getElementById(id);
+  if (el == null) return;
+  const prevStyle = el.style.cssText;
+  switch (prevStyle) {
+    case "display: none;":
+      el.style = "display: block;";
+      break;
+    case "display: block;":
+      el.style = "display: none;";
+      break;
+  }
+}
+
+/**
  * * Returns to HTML code formatted well
  * @param {{important: CharacterStats, chapters: ChapterStats[]}} stats
  * @returns {void}
@@ -221,30 +240,35 @@ function pretty(stats) {
     const chapterDiv = document.createElement("div");
     chapterDiv.className = "chapterDiv";
 
-    chapterDiv.innerHTML = `<h1>${chapter.Chapter}</h1>`;
+    let chapterHTML = `<h1 style='cursor:pointer;' onclick='show("${chapter.Chapter.replace(/ /g, "")}")'>${
+      chapter.Chapter
+    }</h1><div style='display:none;' id='${chapter.Chapter.replace(/ /g, "")}'>`;
 
     if (chapter.A.Completed !== "true") {
       chapterDiv.innerHTML += `<p>${chapter.Chapter} not complete.</p>`;
     }
 
-    const infoDiv = document.createElement("div");
-    infoDiv.className = "info";
+    let infoDiv = '<div class="info">';
     const special = chapter.Chapter[0] !== "C"; // Check if the chapter is prologue or epilogue
     if (!special) {
       if (chapter.A.Completed == "true") {
-        infoDiv.innerHTML += `<fieldset><legend>Side A</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${chapter.A.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${chapter.A.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${chapter.A.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${chapter.A.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${chapter.A.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${chapter.A.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${chapter.A.BestDashes}</div></div></fieldset><br/>`;
+        infoDiv += `<fieldset><legend>Side A</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${chapter.A.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${chapter.A.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${chapter.A.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${chapter.A.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${chapter.A.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${chapter.A.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${chapter.A.BestDashes}</div></div></fieldset><br/>`;
+      } else {
+        infoDiv += `<p>${chapter.Chapter} not completed.</p>`;
       }
       if (chapter.B.Completed == "true") {
-        infoDiv.innerHTML += `<fieldset><legend>Side B</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${chapter.B.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${chapter.B.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${chapter.B.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${chapter.B.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${chapter.B.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${chapter.B.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${chapter.B.BestDashes}</div></div></fieldset><br/>`;
+        infoDiv += `<fieldset><legend>Side B</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${chapter.B.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${chapter.B.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${chapter.B.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${chapter.B.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${chapter.B.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${chapter.B.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${chapter.B.BestDashes}</div></div></fieldset><br/>`;
       }
       if (chapter.C.Completed == "true") {
-        infoDiv.innerHTML += `<fieldset><legend>Side C</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${chapter.C.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${chapter.C.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${chapter.C.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${chapter.C.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${chapter.C.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${chapter.C.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${chapter.C.BestDashes}</div></div></fieldset>`;
+        infoDiv += `<fieldset><legend>Side C</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${chapter.C.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${chapter.C.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${chapter.C.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${chapter.C.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${chapter.C.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${chapter.C.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${chapter.C.BestDashes}</div></div></fieldset>`;
       }
     } else {
-      infoDiv.innerHTML += `<fieldset><legend>${chapter.Chapter}</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${chapter.A.Deaths}</div><div style="margin:auto"><h3>Time</h3>${chapter.A.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${chapter.A.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${chapter.A.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${chapter.A.BestDashes}</div></div></fieldset>`;
+      infoDiv += `<fieldset><legend>${chapter.Chapter}</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${chapter.A.Deaths}</div><div style="margin:auto"><h3>Time</h3>${chapter.A.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${chapter.A.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${chapter.A.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${chapter.A.BestDashes}</div></div></fieldset>`;
     }
 
-    chapterDiv.appendChild(infoDiv);
+    chapterHTML += infoDiv;
+    chapterHTML += "</div>";
+    chapterDiv.innerHTML = chapterHTML;
     outputDiv.appendChild(chapterDiv);
   });
 }
