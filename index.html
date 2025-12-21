@@ -3,18 +3,18 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Celeste</title>
+    <title>Celeste save file viewer</title>
   </head>
   <body>
     <div>
-      <h1>Upload a .celeste file to get started:</h1>
+      <h1>Upload a .celeste file to get started</h1>
       <p>
         <i style="color: grey">
           .celeste files are usually located in the file path C:\Program Files
           (x86)\Steam\steamapps\common\Celeste\Saves
         </i>
       </p>
-      <input type="file" id="file" />
+      <input type="file" id="file" accept=".celeste" />
       <button onclick="fileSubmit()">Submit</button>
     </div>
     <div id="output"></div>
