@@ -198,6 +198,16 @@ function toggle(id) {
 }
 
 /**
+ * * Self explanatory.
+ * @param {ChapterStats["A"]} side
+ * @param {string} chapter
+ */
+
+function generateHTMLForSides(side, chapter) {
+  return `<fieldset><legend>${chapter}</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${side.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${side.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${side.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${side.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${side.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${side.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${side.BestDashes}</div></div></fieldset><br/>`;
+}
+
+/**
  * * Returns to HTML code formatted well
  * @param {{important: CharacterStats, chapters: ChapterStats[]}} stats
  * @returns {void}
@@ -252,18 +262,18 @@ function pretty(stats) {
     const special = chapter.Chapter[0] !== "C"; // Check if the chapter is prologue or epilogue
     if (!special) {
       if (chapter.A.Completed == "true") {
-        infoDiv += `<fieldset><legend>Side A</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${chapter.A.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${chapter.A.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${chapter.A.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${chapter.A.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${chapter.A.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${chapter.A.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${chapter.A.BestDashes}</div></div></fieldset><br/>`;
+        infoDiv += generateHTMLForSides(chapter.A, "A Side");
       } else {
         infoDiv += `<p>${chapter.Chapter} not completed.</p>`;
       }
       if (chapter.B.Completed == "true") {
-        infoDiv += `<fieldset><legend>Side B</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${chapter.B.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${chapter.B.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${chapter.B.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${chapter.B.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${chapter.B.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${chapter.B.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${chapter.B.BestDashes}</div></div></fieldset><br/>`;
+        infoDiv += generateHTMLForSides(chapter.B, "B Side");
       }
       if (chapter.C.Completed == "true") {
-        infoDiv += `<fieldset><legend>Side C</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${chapter.C.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${chapter.C.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${chapter.C.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${chapter.C.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${chapter.C.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${chapter.C.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${chapter.C.BestDashes}</div></div></fieldset>`;
+        infoDiv += generateHTMLForSides(chapter.C, "C Side");
       }
     } else {
-      infoDiv += `<fieldset><legend>${chapter.Chapter}</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${chapter.A.Deaths}</div><div style="margin:auto"><h3>Time</h3>${chapter.A.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${chapter.A.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${chapter.A.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${chapter.A.BestDashes}</div></div></fieldset>`;
+      infoDiv += generateHTMLForSides(chapter.A, chapter.Chapter);
     }
 
     chapterHTML += infoDiv;
