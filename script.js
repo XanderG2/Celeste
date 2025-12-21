@@ -123,21 +123,21 @@ function characterStats(xmlDoc) {
 }
 
 /**
- *
+ * * Get the stats of a side of a chapter
  * @param {Element} side
- * @returns
+ * @returns {{ [stat: string]: string }}
  */
 
 function getStats(side) {
   return {
-    Strawberries: side.getAttribute("TotalStrawberries"),
-    Completed: side.getAttribute("Completed"),
-    Deaths: side.getAttribute("Deaths"),
-    Time: µsToTime(side.getAttribute("TimePlayed")),
-    BestTime: side.getAttribute("BestTime"),
-    BestDashes: side.getAttribute("BestDashes"),
-    BestDeaths: side.getAttribute("BestDeaths"),
-    HeartGem: side.getAttribute("HeartGem"),
+    Strawberries: side.getAttribute("TotalStrawberries") ?? "",
+    Completed: side.getAttribute("Completed") ?? "",
+    Deaths: side.getAttribute("Deaths") ?? "",
+    Time: µsToTime(side.getAttribute("TimePlayed")) ?? "",
+    BestTime: side.getAttribute("BestTime") ?? "",
+    BestDashes: side.getAttribute("BestDashes") ?? "",
+    BestDeaths: side.getAttribute("BestDeaths") ?? "",
+    HeartGem: side.getAttribute("HeartGem") ?? "",
   };
 }
 
@@ -185,8 +185,16 @@ function chapterStats(xmlDoc) {
   return chapterStats;
 }
 
+/**
+ * * Returns to HTML code formatted well
+ * @param {{important: Object, [key:string]: Object}} stats
+ * @returns {void}
+ */
+
 function pretty(stats) {
   const outputDiv = document.getElementById("output");
+  if (outputDiv == null) return; // Nowhere to put output
+
   outputDiv.innerHTML = ""; // Clear the output before replacing it
 
   const important = stats.important;
@@ -200,13 +208,13 @@ function pretty(stats) {
 
   const div1 = document.createElement("div"); // The first line of stats
   div1.style = "display:flex;";
-  for (KVP of OneToFour) {
+  for (const KVP of OneToFour) {
     div1.innerHTML += `<div style="margin:auto"><h3>${KVP[0]}</h3><p>${KVP[1]}</p></div>`;
   }
 
   const div2 = document.createElement("div"); // The second line of stats
   div2.style = "display:flex;";
-  for (KVP of FiveToEight) {
+  for (const KVP of FiveToEight) {
     div2.innerHTML += `<div style="margin:auto"><h3>${KVP[0]}</h3><p>${KVP[1]}</p></div>`;
   }
 
@@ -214,18 +222,26 @@ function pretty(stats) {
   importantFieldset.appendChild(div2);
   outputDiv.appendChild(importantFieldset);
 
-  delete stats.important;
+  Object.keys(stats)
+    .filter((key) => key !== "important")
+    .forEach((chapterId) => {
+      const chapter = stats[chapterId];
+      console.log(chapter);
 
-  //TODO: change to using a template
-  Object.keys(stats).forEach((chapterId) => {
-    const chapter = stats[chapterId];
-    console.log(chapter);
-    const chapterDiv = document.createElement("div");
-    if (chapter.A.Completed == "true") {
-      chapterDiv.innerHTML = `<h1>${chapter.Chapter}</h1><div></div>`;
-    } else {
-      chapterDiv.innerHTML = `${chapter.Chapter} Not Completed`;
-    }
-    outputDiv.appendChild(chapterDiv);
-  });
+      const chapterDiv = document.createElement("div");
+      chapterDiv.className = "chapterDiv";
+
+      chapterDiv.innerHTML = `<h1>${chapter.Chapter}</h1>`;
+
+      if (chapter.A.Completed !== "true") {
+        chapterDiv.innerHTML += `<p>${chapter.Chapter} not complete.</p>`;
+      }
+
+      const infoDiv = document.createElement("div");
+      infoDiv.className = "info";
+      infoDiv.innerHTML += ``; //TODO: add stats
+
+      chapterDiv.appendChild(infoDiv);
+      outputDiv.appendChild(chapterDiv);
+    });
 }
