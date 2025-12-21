@@ -1,4 +1,6 @@
 function fileSubmit() {
+  //* Runs upon submission of a file
+  //TODO: explain
   const input = document.getElementById("file");
   const file = input.files[0];
   const reader = new FileReader();
@@ -11,14 +13,18 @@ function fileSubmit() {
 }
 
 function handle(contents) {
+  //* Parses XML
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(contents, "text/xml");
+
   const BaseStatsJSON = BaseStats(xmlDoc);
   const AreaStatsJSON = AreaStats(xmlDoc);
+
   let JSoN = { ...BaseStatsJSON, ...AreaStatsJSON };
-  let KVP = [];
+  let KVP = []; // Key-Value pairs
   const K = Object.keys(JSoN);
   const V = Object.values(JSoN);
+
   for (let i = 0; i < K.length; i++) {
     KVP.push([K[i], V[i]]);
   }
@@ -36,8 +42,10 @@ function BaseStats(xmlDoc) {
     "TotalWallJumps",
     "TotalDashes",
   ];
-  let JSON = { important: {} };
+
+  let JSON = { important: {} }; //TODO: rename to something other than JSON
   for (const id of importantInfo) {
+    //TODO: add explanation
     const spaces = (
       id
         .replace(/([A-Z])/g, " $1")
@@ -46,11 +54,13 @@ function BaseStats(xmlDoc) {
     ).trim();
     JSON.important[spaces] = xmlDoc.getElementsByTagName(id)[0].childNodes[0].nodeValue;
   }
+
   JSON.important.Time = timeToTime(JSON.important.Time);
   return JSON;
 }
 
 function timeToTime(durationU) {
+  //TODO: add explanation of what this function does
   let duration = durationU / 10000;
   let milliseconds = duration % 1000;
   let seconds = Math.floor((duration / 1000) % 60);
@@ -67,12 +77,15 @@ function timeToTime(durationU) {
 }
 
 function AreaStats(xmlDoc) {
-  const Areas = xmlDoc.getElementsByTagName("Areas")[0];
+  const Areas = xmlDoc.getElementsByTagName("Areas")[0]; //* what does this do?
   const allAreaStats = Areas.getElementsByTagName("AreaStats");
   let JSON = {};
+
   for (const areaStat of allAreaStats) {
     const id = areaStat.getAttribute("ID");
-    let chapter = "";
+    let chapter = ""; //TODO: rename this to chapterName
+
+    //TODO: make this better
     if (id == 0) {
       chapter = "Prologue";
     } else if (id > 0 && id < 8) {
@@ -82,10 +95,13 @@ function AreaStats(xmlDoc) {
     } else if (id > 8) {
       chapter = `Chapter ${id - 1}`;
     }
+
     const areamodestats = areaStat.getElementsByTagName("AreaModeStats");
     const A = areamodestats[0];
     const B = areamodestats[1];
     const C = areamodestats[2];
+
+    //TODO: use a function for repetitive getAttribute calls
     const AsideStats = {
       Strawberries: A.getAttribute("TotalStrawberries"),
       Completed: A.getAttribute("Completed"),
@@ -96,6 +112,7 @@ function AreaStats(xmlDoc) {
       BestDeaths: A.getAttribute("BestDeaths"),
       HeartGem: A.getAttribute("HeartGem"),
     };
+
     const BsideStats = {
       Completed: B.getAttribute("Completed"),
       Deaths: B.getAttribute("Deaths"),
@@ -105,6 +122,7 @@ function AreaStats(xmlDoc) {
       BestDeaths: B.getAttribute("BestDeaths"),
       HeartGem: B.getAttribute("HeartGem"),
     };
+
     const CsideStats = {
       Completed: C.getAttribute("Completed"),
       Deaths: C.getAttribute("Deaths"),
@@ -114,6 +132,9 @@ function AreaStats(xmlDoc) {
       BestDeaths: C.getAttribute("BestDeaths"),
       HeartGem: C.getAttribute("HeartGem"),
     };
+
+    //* The formatted JSON for this chapter, probably shouldn't call it JSON.
+    // TODO: change this whole function and rename JSON variable
     JSON[id] = {
       Chapter: chapter,
       Cassette: areaStat.getAttribute("Cassette"),
@@ -127,27 +148,36 @@ function AreaStats(xmlDoc) {
 
 function pretty(stats) {
   const outputDiv = document.getElementById("output");
-  outputDiv.innerHTML = "";
+  outputDiv.innerHTML = ""; // Clear the output before replacing it
+
   const important = stats.important;
   const importantKVP = Object.entries(important);
-  const OneToFour = importantKVP.splice(0, 4);
-  const FiveToEight = importantKVP.splice(0, 4);
+
   const importantFieldset = document.createElement("fieldset");
   importantFieldset.innerHTML = `<legend>Total Statistics</legend>`;
-  const div1 = document.createElement("div");
+
+  const OneToFour = importantKVP.splice(0, 4); //* Name, Time, Deaths, Strawbs
+  const FiveToEight = importantKVP.splice(0, 4); //* Golden Strawbs, Jumps, Wall Jumps, Dashes
+
+  const div1 = document.createElement("div"); // The first line of stats
   div1.style = "display:flex;";
   for (KVP of OneToFour) {
     div1.innerHTML += `<div style="margin:auto"><h3>${KVP[0]}</h3><p>${KVP[1]}</p></div>`;
   }
-  const div2 = document.createElement("div");
+
+  const div2 = document.createElement("div"); // The second line of stats
   div2.style = "display:flex;";
   for (KVP of FiveToEight) {
     div2.innerHTML += `<div style="margin:auto"><h3>${KVP[0]}</h3><p>${KVP[1]}</p></div>`;
   }
+
   importantFieldset.appendChild(div1);
   importantFieldset.appendChild(div2);
   outputDiv.appendChild(importantFieldset);
+
   delete stats.important;
+
+  //TODO: change to using a template
   Object.keys(stats).forEach((chapterId) => {
     const chapter = stats[chapterId];
     console.log(chapter);
