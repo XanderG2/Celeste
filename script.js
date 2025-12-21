@@ -45,23 +45,19 @@ function fileSubmit() {
   reader.readAsText(file);
 }
 
+/**
+ * * Parses XML
+ * @param {string} contents
+ * @returns {Object}
+ */
 function handle(contents) {
-  //* Parses XML
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(contents, "text/xml");
 
   const BaseStatsJSON = BaseStats(xmlDoc);
   const AreaStatsJSON = AreaStats(xmlDoc);
 
-  let JSoN = { ...BaseStatsJSON, ...AreaStatsJSON };
-  let KVP = []; // Key-Value pairs
-  const K = Object.keys(JSoN);
-  const V = Object.values(JSoN);
-
-  for (let i = 0; i < K.length; i++) {
-    KVP.push([K[i], V[i]]);
-  }
-  return JSoN;
+  return { ...BaseStatsJSON, ...AreaStatsJSON };
 }
 
 function BaseStats(xmlDoc) {
