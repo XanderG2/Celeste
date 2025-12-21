@@ -44,8 +44,7 @@ function BaseStats(xmlDoc) {
         .charAt(0)
         .toUpperCase() + id.replace(/([A-Z])/g, " $1").slice(1)
     ).trim();
-    JSON.important[spaces] =
-      xmlDoc.getElementsByTagName(id)[0].childNodes[0].nodeValue;
+    JSON.important[spaces] = xmlDoc.getElementsByTagName(id)[0].childNodes[0].nodeValue;
   }
   JSON.important.Time = timeToTime(JSON.important.Time);
   return JSON;
@@ -128,12 +127,13 @@ function AreaStats(xmlDoc) {
 
 function pretty(stats) {
   const outputDiv = document.getElementById("output");
+  outputDiv.innerHTML = "";
   const important = stats.important;
   const importantKVP = Object.entries(important);
   const OneToFour = importantKVP.splice(0, 4);
   const FiveToEight = importantKVP.splice(0, 4);
   const importantFieldset = document.createElement("fieldset");
-  importantFieldset.innerHTML = `<legend>Statistics</legend>`;
+  importantFieldset.innerHTML = `<legend>Total Statistics</legend>`;
   const div1 = document.createElement("div");
   div1.style = "display:flex;";
   for (KVP of OneToFour) {
