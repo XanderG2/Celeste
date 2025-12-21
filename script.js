@@ -57,9 +57,30 @@ function handle(contents) {
   const xmlDoc = parser.parseFromString(contents, "text/xml");
 
   const characterStatsJSON = characterStats(xmlDoc);
-  const AreaStatsJSON = AreaStats(xmlDoc);
+  const chapterStatsJSON = chapterStats(xmlDoc);
 
-  return { important: characterStatsJSON, ...AreaStatsJSON };
+  return { important: characterStatsJSON, ...chapterStatsJSON };
+}
+
+/**
+ * * converts input µs to formatted HH:MM:SS.MMM format
+ * @param {*} durationU
+ * @returns {string}
+ */
+
+function µsToTime(durationU) {
+  let duration = durationU / 10000;
+  let milliseconds = duration % 1000;
+  let seconds = Math.floor((duration / 1000) % 60);
+  let minutes = Math.floor((duration / (1000 * 60)) % 60);
+  let hours = Math.floor(duration / (1000 * 60 * 60));
+
+  // Pad with leading zeros
+  let h = String(hours).padStart(2, "0");
+  let m = String(minutes).padStart(2, "0");
+  let s = String(seconds).padStart(2, "0");
+  let ms = String(milliseconds).padStart(3, "0"); // always 3 digits
+  return `${h}:${m}:${s}.${ms}`;
 }
 
 /**
@@ -102,96 +123,66 @@ function characterStats(xmlDoc) {
 }
 
 /**
- * * converts input µs to formatted HH:MM:SS.MMM format
- * @param {*} durationU
- * @returns {string}
+ *
+ * @param {Element} side
+ * @returns
  */
 
-function µsToTime(durationU) {
-  let duration = durationU / 10000;
-  let milliseconds = duration % 1000;
-  let seconds = Math.floor((duration / 1000) % 60);
-  let minutes = Math.floor((duration / (1000 * 60)) % 60);
-  let hours = Math.floor(duration / (1000 * 60 * 60));
-
-  // Pad with leading zeros
-  let h = String(hours).padStart(2, "0");
-  let m = String(minutes).padStart(2, "0");
-  let s = String(seconds).padStart(2, "0");
-  let ms = String(milliseconds).padStart(3, "0"); // always 3 digits
-  console.log(durationU);
-  console.log(`${h}:${m}:${s}.${ms}`);
-  return `${h}:${m}:${s}.${ms}`;
+function getStats(side) {
+  return {
+    Strawberries: side.getAttribute("TotalStrawberries"),
+    Completed: side.getAttribute("Completed"),
+    Deaths: side.getAttribute("Deaths"),
+    Time: µsToTime(side.getAttribute("TimePlayed")),
+    BestTime: side.getAttribute("BestTime"),
+    BestDashes: side.getAttribute("BestDashes"),
+    BestDeaths: side.getAttribute("BestDeaths"),
+    HeartGem: side.getAttribute("HeartGem"),
+  };
 }
 
-function AreaStats(xmlDoc) {
-  const Areas = xmlDoc.getElementsByTagName("Areas")[0]; //* what does this do?
-  const allAreaStats = Areas.getElementsByTagName("AreaStats");
-  let JSON = {};
+/**
+ * * Get chapter-related stats
+ * @param {Document} xmlDoc
+ * @returns {{[chapter: string]: Object}}
+ */
+
+function chapterStats(xmlDoc) {
+  const areas = xmlDoc.getElementsByTagName("Areas")[0]; // Find the chapter tag in XML
+  const allAreaStats = areas.getElementsByTagName("AreaStats"); // Find the statistics for all chapters
+
+  /** @type {{[chapter: string]: Object}} */
+  let chapterStats = {};
 
   for (const areaStat of allAreaStats) {
-    const id = areaStat.getAttribute("ID");
-    let chapter = ""; //TODO: rename this to chapterName
-
-    //TODO: make this better
-    if (id == 0) {
-      chapter = "Prologue";
-    } else if (id > 0 && id < 8) {
-      chapter = `Chapter ${id}`;
-    } else if (id == 8) {
-      chapter = "Epilogue";
-    } else if (id > 8) {
-      chapter = `Chapter ${id - 1}`;
+    let idAttribute = areaStat.getAttribute("ID");
+    if (idAttribute == null) {
+      console.error("idAttribute is null!");
+      idAttribute = "-1"; // idAttribute shouldn't be null, but if it is, set it -1
     }
 
-    const areamodestats = areaStat.getElementsByTagName("AreaModeStats");
-    const A = areamodestats[0];
-    const B = areamodestats[1];
-    const C = areamodestats[2];
+    const id = parseInt(idAttribute, 10);
 
-    //TODO: use a function for repetitive getAttribute calls
-    const AsideStats = {
-      Strawberries: A.getAttribute("TotalStrawberries"),
-      Completed: A.getAttribute("Completed"),
-      Deaths: A.getAttribute("Deaths"),
-      Time: µsToTime(A.getAttribute("TimePlayed")),
-      BestTime: A.getAttribute("BestTime"),
-      BestDashes: A.getAttribute("BestDashes"),
-      BestDeaths: A.getAttribute("BestDeaths"),
-      HeartGem: A.getAttribute("HeartGem"),
-    };
+    const chapterName = id === 0 ? "Prologue" : id === 8 ? "Epilogue" : id < 8 ? `Chapter ${id}` : `Chapter ${id - 1}`; // id is stored as a number in the game's code, however is displayed differently
 
-    const BsideStats = {
-      Completed: B.getAttribute("Completed"),
-      Deaths: B.getAttribute("Deaths"),
-      Time: µsToTime(B.getAttribute("TimePlayed")),
-      BestTime: B.getAttribute("BestTime"),
-      BestDashes: B.getAttribute("BestDashes"),
-      BestDeaths: B.getAttribute("BestDeaths"),
-      HeartGem: B.getAttribute("HeartGem"),
-    };
+    const sides = areaStat.getElementsByTagName("AreaModeStats");
 
-    const CsideStats = {
-      Completed: C.getAttribute("Completed"),
-      Deaths: C.getAttribute("Deaths"),
-      Time: µsToTime(C.getAttribute("TimePlayed")),
-      BestTime: C.getAttribute("BestTime"),
-      BestDashes: C.getAttribute("BestDashes"),
-      BestDeaths: C.getAttribute("BestDeaths"),
-      HeartGem: C.getAttribute("HeartGem"),
-    };
+    const A = sides[0];
+    const B = sides[1];
+    const C = sides[2];
+    const AsideStats = getStats(A);
+    const BsideStats = getStats(B);
+    const CsideStats = getStats(C);
 
-    //* The formatted JSON for this chapter, probably shouldn't call it JSON.
-    // TODO: change this whole function and rename JSON variable
-    JSON[id] = {
-      Chapter: chapter,
+    chapterStats[id] = {
+      Chapter: chapterName,
       Cassette: areaStat.getAttribute("Cassette"),
       A: AsideStats,
       B: BsideStats,
       C: CsideStats,
     };
   }
-  return JSON;
+  return chapterStats;
 }
 
 function pretty(stats) {
