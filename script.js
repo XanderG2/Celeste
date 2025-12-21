@@ -89,7 +89,7 @@ function characterStats(xmlDoc) {
 
     let val = xmlDoc.getElementsByTagName(id)[0].childNodes[0].nodeValue; // The value of the stat
 
-    if (key === "Time") val = timeToTime(val); // Change time to time format HH:MM:SS.MMM
+    if (key === "Time") val = µsToTime(val); // Change time to time format HH:MM:SS.MMM
 
     if (val == null) {
       val = ""; // val shouldn't be null, but if it is, set it to an empty string
@@ -102,13 +102,12 @@ function characterStats(xmlDoc) {
 }
 
 /**
- *
+ * * converts input µs to formatted HH:MM:SS.MMM format
  * @param {*} durationU
  * @returns {string}
  */
 
-function timeToTime(durationU) {
-  //TODO: add explanation of what this function does
+function µsToTime(durationU) {
   let duration = durationU / 10000;
   let milliseconds = duration % 1000;
   let seconds = Math.floor((duration / 1000) % 60);
@@ -120,7 +119,8 @@ function timeToTime(durationU) {
   let m = String(minutes).padStart(2, "0");
   let s = String(seconds).padStart(2, "0");
   let ms = String(milliseconds).padStart(3, "0"); // always 3 digits
-
+  console.log(durationU);
+  console.log(`${h}:${m}:${s}.${ms}`);
   return `${h}:${m}:${s}.${ms}`;
 }
 
@@ -154,7 +154,7 @@ function AreaStats(xmlDoc) {
       Strawberries: A.getAttribute("TotalStrawberries"),
       Completed: A.getAttribute("Completed"),
       Deaths: A.getAttribute("Deaths"),
-      Time: timeToTime(A.getAttribute("TimePlayed")),
+      Time: µsToTime(A.getAttribute("TimePlayed")),
       BestTime: A.getAttribute("BestTime"),
       BestDashes: A.getAttribute("BestDashes"),
       BestDeaths: A.getAttribute("BestDeaths"),
@@ -164,7 +164,7 @@ function AreaStats(xmlDoc) {
     const BsideStats = {
       Completed: B.getAttribute("Completed"),
       Deaths: B.getAttribute("Deaths"),
-      Time: timeToTime(B.getAttribute("TimePlayed")),
+      Time: µsToTime(B.getAttribute("TimePlayed")),
       BestTime: B.getAttribute("BestTime"),
       BestDashes: B.getAttribute("BestDashes"),
       BestDeaths: B.getAttribute("BestDeaths"),
@@ -174,7 +174,7 @@ function AreaStats(xmlDoc) {
     const CsideStats = {
       Completed: C.getAttribute("Completed"),
       Deaths: C.getAttribute("Deaths"),
-      Time: timeToTime(C.getAttribute("TimePlayed")),
+      Time: µsToTime(C.getAttribute("TimePlayed")),
       BestTime: C.getAttribute("BestTime"),
       BestDashes: C.getAttribute("BestDashes"),
       BestDeaths: C.getAttribute("BestDeaths"),
