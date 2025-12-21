@@ -5,6 +5,7 @@
  * * Finds file, and passes it off to handle
  * @returns {void}
  */
+
 function fileSubmit() {
   /** @type {HTMLInputElement | null} */
   const input = document.querySelector('input[type="file"]'); // The Choose file button
@@ -47,20 +48,27 @@ function fileSubmit() {
 
 /**
  * * Parses XML
- * @param {string} contents
- * @returns {Object}
+ * @param {string} contents - XML file as string
+ * @returns {Object} Object of overall and chapter statistics
  */
+
 function handle(contents) {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(contents, "text/xml");
 
-  const BaseStatsJSON = BaseStats(xmlDoc);
+  const characterStatsJSON = characterStats(xmlDoc);
   const AreaStatsJSON = AreaStats(xmlDoc);
 
-  return { ...BaseStatsJSON, ...AreaStatsJSON };
+  return { important: characterStatsJSON, ...AreaStatsJSON };
 }
 
-function BaseStats(xmlDoc) {
+/**
+ * * Get character-related stats
+ * @param {Document} xmlDoc - The XML document to parse
+ * @returns {{[stat: string]: string}} An object containing character-related stats
+ */
+
+function characterStats(xmlDoc) {
   const importantInfo = [
     "Name",
     "Time",
@@ -72,21 +80,32 @@ function BaseStats(xmlDoc) {
     "TotalDashes",
   ];
 
-  let JSON = { important: {} }; //TODO: rename to something other than JSON
+  /** @type {{ [stat: string]: string }} */
+  let importantStats = {};
+
   for (const id of importantInfo) {
-    //TODO: add explanation
-    const spaces = (
-      id
-        .replace(/([A-Z])/g, " $1")
-        .charAt(0)
-        .toUpperCase() + id.replace(/([A-Z])/g, " $1").slice(1)
-    ).trim();
-    JSON.important[spaces] = xmlDoc.getElementsByTagName(id)[0].childNodes[0].nodeValue;
+    const spaced = id.replace(/([A-Z])/g, " $1").trim();
+    const key = `${spaced[0].toUpperCase()}${spaced.slice(1)}`; // Converts the id to a human-readable name
+
+    let val = xmlDoc.getElementsByTagName(id)[0].childNodes[0].nodeValue; // The value of the stat
+
+    if (key === "Time") val = timeToTime(val); // Change time to time format HH:MM:SS.MMM
+
+    if (val == null) {
+      val = ""; // val shouldn't be null, but if it is, set it to an empty string
+    }
+
+    importantStats[key] = val;
   }
 
-  JSON.important.Time = timeToTime(JSON.important.Time);
-  return JSON;
+  return importantStats;
 }
+
+/**
+ *
+ * @param {*} durationU
+ * @returns {string}
+ */
 
 function timeToTime(durationU) {
   //TODO: add explanation of what this function does
