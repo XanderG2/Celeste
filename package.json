@@ -1,0 +1,15 @@
+{
+  "name": "celeste",
+  "version": "1.0.0",
+  "main": "script.tsx",
+  "scripts": {
+    "start": "tsc --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "XanderG2",
+  "license": "SEE LICENSE IN LICENSE.md",
+  "description": "",
+  "devDependencies": {
+    "typescript": "^5.9.3"
+  }
+}

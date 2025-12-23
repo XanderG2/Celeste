@@ -1,0 +1,15 @@
+{
+  "$schema": "https://www.schemastore.org/tsconfig",
+
+  "compilerOptions": {
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "module": "esnext",
+    "target": "es2022",
+
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "strict": true
+  }
+}
