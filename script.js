@@ -1,5 +1,5 @@
 import { createRoot } from "react-dom/client";
-import React, { useRef, useState, useMemo } from "react";
+import React, { useRef, useState } from "react";
 /**
  * * Parses XML
  * @param contents - XML file as string
@@ -122,111 +122,90 @@ function toggle(id) {
  * @param side
  * @param sideName - Either Prologue, Epilogue, A, B, or C
  */
-function generateHTMLForSides(side, sideName) {
-    return /* HTML */ `<fieldset>
-      <legend>${sideName}</legend>
-      <div style="display:flex;">
-        <div style="margin:auto">
-          <h3>Deaths</h3>
-          ${side.Deaths}
-        </div>
-        <div style="margin:auto">
-          <h3>Heart Crystal?</h3>
-          ${side.HeartGem}
-        </div>
-        <div style="margin:auto">
-          <h3>Strawberries</h3>
-          ${side.Strawberries}
-        </div>
-        <div style="margin:auto">
-          <h3>Time</h3>
-          ${side.Time}
-        </div>
-      </div>
-      <div style="display:flex;">
-        <div style="margin:auto">
-          <h3>Best Deaths</h3>
-          ${side.BestDeaths}
-        </div>
-        <div style="margin:auto">
-          <h3>Best Time</h3>
-          ${side.BestTime}
-        </div>
-        <div style="margin:auto">
-          <h3>Best Dashes</h3>
-          ${side.BestDashes}
-        </div>
-      </div>
-    </fieldset>
-    <br />`;
-}
+const Sides = ({ side, sideName }) => {
+    return (React.createElement("fieldset", null,
+        React.createElement("legend", null, sideName),
+        React.createElement("div", { style: { display: "flex" } },
+            React.createElement("div", { style: { margin: "auto" } },
+                React.createElement("h3", null, "Deaths"),
+                side.Deaths),
+            React.createElement("div", { style: { margin: "auto" } },
+                React.createElement("h3", null, "Heart Crystal?"),
+                side.HeartGem),
+            React.createElement("div", { style: { margin: "auto" } },
+                React.createElement("h3", null, "Strawberries"),
+                side.Strawberries),
+            React.createElement("div", { style: { margin: "auto" } },
+                React.createElement("h3", null, "Time"),
+                side.Time)),
+        React.createElement("div", { style: { display: "flex" } },
+            React.createElement("div", { style: { margin: "auto" } },
+                React.createElement("h3", null, "Best Deaths"),
+                side.BestDeaths),
+            React.createElement("div", { style: { margin: "auto" } },
+                React.createElement("h3", null, "Best Time"),
+                side.BestTime),
+            React.createElement("div", { style: { margin: "auto" } },
+                React.createElement("h3", null, "Best Dashes"),
+                side.BestDashes))));
+};
+const Character = ({ important }) => {
+    const importantKVP = Object.entries(important);
+    const OneToFour = importantKVP.splice(0, 4); //* Name, Time, Deaths, Strawbs
+    const FiveToEight = importantKVP.splice(0, 4); //* Golden Strawbs, Jumps, Wall Jumps, Dashes
+    const divs1 = []; // The first line of stats
+    for (const [key, value] of OneToFour) {
+        divs1.push(React.createElement("div", { key: key, style: { margin: "auto" } },
+            React.createElement("h3", null, key),
+            React.createElement("p", null, value)));
+    }
+    const divs2 = []; // The second line of stats
+    for (const [key, value] of FiveToEight) {
+        divs2.push(React.createElement("div", { key: key, style: { margin: "auto" } },
+            React.createElement("h3", null, key),
+            React.createElement("p", null, value)));
+    }
+    return (React.createElement("fieldset", null,
+        React.createElement("legend", null, "Total Statistics"),
+        React.createElement("div", { style: { display: "flex" } }, divs1),
+        React.createElement("div", { style: { display: "flex" } }, divs2)));
+};
+const Chapter = ({ chapter, open, toggle }) => {
+    console.log(chapter);
+    const special = chapter.Chapter[0] !== "C"; // Check if the chapter is prologue or epilogue
+    return (React.createElement("div", { className: "chapterDiv" },
+        React.createElement("h1", { style: { cursor: "pointer" }, onClick: toggle }, chapter.Chapter),
+        !open ? null : (React.createElement("div", null,
+            React.createElement("div", { style: { display: "flex", justifyContent: "space-around" } },
+                chapter.B.HeartGem == "true" ? React.createElement("img", { src: "redHeart.png" }) : null,
+                chapter.A.HeartGem == "true" ? React.createElement("img", { src: "blueHeart.png" }) : null,
+                chapter.C.HeartGem == "true" ? React.createElement("img", { src: "goldHeart.png" }) : null),
+            chapter.A.Completed !== "true" ? (React.createElement("p", null,
+                chapter.Chapter,
+                " not complete.")) : (React.createElement("div", { className: "info" }, special ? (React.createElement(Sides, { side: chapter.A, sideName: chapter.Chapter })) : (React.createElement(React.Fragment, null,
+                React.createElement(Sides, { side: chapter.A, sideName: "A Side" }),
+                chapter.B.Completed == "true" ? React.createElement(Sides, { side: chapter.A, sideName: "B Side" }) : null,
+                chapter.C.Completed == "true" ? React.createElement(Sides, { side: chapter.A, sideName: "C Side" }) : null))))))));
+};
 /**
  * * Returns to HTML code formatted well
  */
 const Pretty = (props) => {
     const { KVP: stats } = props;
-    const outputDiv = useMemo(() => document.getElementById("output"), []);
-    if (outputDiv == null)
-        return; // Nowhere to put output
-    outputDiv.innerHTML = ""; // Clear the output before replacing it
-    const important = stats.important;
-    const importantKVP = Object.entries(important);
-    const importantFieldset = document.createElement("fieldset");
-    importantFieldset.innerHTML = `<legend>Total Statistics</legend>`;
-    const OneToFour = importantKVP.splice(0, 4); //* Name, Time, Deaths, Strawbs
-    const FiveToEight = importantKVP.splice(0, 4); //* Golden Strawbs, Jumps, Wall Jumps, Dashes
-    const div1 = document.createElement("div"); // The first line of stats
-    div1.style = "display:flex;";
-    for (const KVP of OneToFour) {
-        div1.innerHTML += `<div style="margin:auto"><h3>${KVP[0]}</h3><p>${KVP[1]}</p></div>`;
-    }
-    const div2 = document.createElement("div"); // The second line of stats
-    div2.style = "display:flex;";
-    for (const KVP of FiveToEight) {
-        div2.innerHTML += `<div style="margin:auto"><h3>${KVP[0]}</h3><p>${KVP[1]}</p></div>`;
-    }
-    importantFieldset.appendChild(div1);
-    importantFieldset.appendChild(div2);
-    outputDiv.appendChild(importantFieldset);
-    stats.chapters.forEach((chapter) => {
-        console.log(chapter);
-        const chapterDiv = document.createElement("div");
-        chapterDiv.className = "chapterDiv";
-        let chapterHTML = `<h1 style='cursor:pointer;' onclick='toggle("${chapter.Chapter.replace(/ /g, "")}")'>${chapter.Chapter}</h1><div style='display:none;' id='${chapter.Chapter.replace(/ /g, "")}'><div style='display:flex;justify-content: space-around;'>`;
-        if (chapter.B.HeartGem == "true")
-            chapterHTML += "<img src='redHeart.png'/>";
-        if (chapter.A.HeartGem == "true")
-            chapterHTML += "<img src='blueHeart.png'/>";
-        if (chapter.C.HeartGem == "true")
-            chapterHTML += "<img src='goldHeart.png'/>";
-        chapterHTML += "</div>";
-        if (chapter.A.Completed !== "true")
-            chapterDiv.innerHTML += `<p>${chapter.Chapter} not complete.</p>`;
-        let infoDiv = '<div class="info">';
-        const special = chapter.Chapter[0] !== "C"; // Check if the chapter is prologue or epilogue
-        if (!special) {
-            if (chapter.A.Completed == "true") {
-                infoDiv += generateHTMLForSides(chapter.A, "A Side");
-            }
-            else {
-                infoDiv += `<p>${chapter.Chapter} not completed.</p>`;
-            }
-            if (chapter.B.Completed == "true") {
-                infoDiv += generateHTMLForSides(chapter.B, "B Side");
-            }
-            if (chapter.C.Completed == "true") {
-                infoDiv += generateHTMLForSides(chapter.C, "C Side");
-            }
-        }
-        else {
-            infoDiv += generateHTMLForSides(chapter.A, chapter.Chapter);
-        }
-        chapterHTML += infoDiv;
-        chapterHTML += "</div>";
-        chapterDiv.innerHTML = chapterHTML;
-        outputDiv.appendChild(chapterDiv);
-    });
-    return React.createElement("div", { dangerouslySetInnerHTML: { __html: outputDiv.innerHTML } });
+    const [openChapters, setOpenChapters] = useState([]);
+    return (React.createElement("div", null,
+        React.createElement(Character, { important: stats.important }),
+        stats.chapters.map((chapter) => (React.createElement(Chapter, { chapter: chapter, open: openChapters.includes(chapter.Chapter), toggle: () => {
+                setOpenChapters((openChapters) => {
+                    const index = openChapters.indexOf(chapter.Chapter);
+                    if (index >= 0) {
+                        return [...openChapters.slice(0, index), ...openChapters.slice(index + 1)];
+                    }
+                    else {
+                        return [...openChapters, chapter.Chapter];
+                    }
+                });
+            } })))));
 };
 function App() {
     const fileInputRef = useRef(null);

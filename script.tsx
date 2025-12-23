@@ -151,44 +151,116 @@ function toggle(id: string) {
  * @param sideName - Either Prologue, Epilogue, A, B, or C
  */
 
-function generateHTMLForSides(side: ChapterStats["A"], sideName: string) {
-  return /* HTML */ `<fieldset>
-      <legend>${sideName}</legend>
-      <div style="display:flex;">
-        <div style="margin:auto">
+const Sides: FC<{ side: ChapterStats["A"]; sideName: string }> = ({ side, sideName }) => {
+  return (
+    <fieldset>
+      <legend>{sideName}</legend>
+      <div style={{ display: "flex" }}>
+        <div style={{ margin: "auto" }}>
           <h3>Deaths</h3>
-          ${side.Deaths}
+          {side.Deaths}
         </div>
-        <div style="margin:auto">
+        <div style={{ margin: "auto" }}>
           <h3>Heart Crystal?</h3>
-          ${side.HeartGem}
+          {side.HeartGem}
         </div>
-        <div style="margin:auto">
+        <div style={{ margin: "auto" }}>
           <h3>Strawberries</h3>
-          ${side.Strawberries}
+          {side.Strawberries}
         </div>
-        <div style="margin:auto">
+        <div style={{ margin: "auto" }}>
           <h3>Time</h3>
-          ${side.Time}
+          {side.Time}
         </div>
       </div>
-      <div style="display:flex;">
-        <div style="margin:auto">
+      <div style={{ display: "flex" }}>
+        <div style={{ margin: "auto" }}>
           <h3>Best Deaths</h3>
-          ${side.BestDeaths}
+          {side.BestDeaths}
         </div>
-        <div style="margin:auto">
+        <div style={{ margin: "auto" }}>
           <h3>Best Time</h3>
-          ${side.BestTime}
+          {side.BestTime}
         </div>
-        <div style="margin:auto">
+        <div style={{ margin: "auto" }}>
           <h3>Best Dashes</h3>
-          ${side.BestDashes}
+          {side.BestDashes}
         </div>
       </div>
     </fieldset>
-    <br />`;
-}
+  );
+};
+
+const Character: FC<{ important: CharacterStats }> = ({ important }) => {
+  const importantKVP = Object.entries(important);
+  const OneToFour = importantKVP.splice(0, 4); //* Name, Time, Deaths, Strawbs
+  const FiveToEight = importantKVP.splice(0, 4); //* Golden Strawbs, Jumps, Wall Jumps, Dashes
+
+  const divs1 = []; // The first line of stats
+  for (const [key, value] of OneToFour) {
+    divs1.push(
+      <div key={key} style={{ margin: "auto" }}>
+        <h3>{key}</h3>
+        <p>{value}</p>
+      </div>
+    );
+  }
+
+  const divs2 = []; // The second line of stats
+  for (const [key, value] of FiveToEight) {
+    divs2.push(
+      <div key={key} style={{ margin: "auto" }}>
+        <h3>{key}</h3>
+        <p>{value}</p>
+      </div>
+    );
+  }
+
+  return (
+    <fieldset>
+      <legend>Total Statistics</legend>
+      <div style={{ display: "flex" }}>{divs1}</div>
+      <div style={{ display: "flex" }}>{divs2}</div>
+    </fieldset>
+  );
+};
+
+const Chapter: FC<{ chapter: ChapterStats; open: boolean; toggle: () => void }> = ({ chapter, open, toggle }) => {
+  console.log(chapter);
+  const special = chapter.Chapter[0] !== "C"; // Check if the chapter is prologue or epilogue
+
+  return (
+    <div className="chapterDiv">
+      <h1 style={{ cursor: "pointer" }} onClick={toggle}>
+        {chapter.Chapter}
+      </h1>
+      {!open ? null : (
+        <div>
+          <div style={{ display: "flex", justifyContent: "space-around" }}>
+            {chapter.B.HeartGem == "true" ? <img src="redHeart.png" /> : null}
+            {chapter.A.HeartGem == "true" ? <img src="blueHeart.png" /> : null}
+            {chapter.C.HeartGem == "true" ? <img src="goldHeart.png" /> : null}
+          </div>
+          {chapter.A.Completed !== "true" ? (
+            <p>{chapter.Chapter} not complete.</p>
+          ) : (
+            <div className="info">
+              {special ? (
+                <Sides side={chapter.A} sideName={chapter.Chapter} />
+              ) : (
+                <>
+                  <Sides side={chapter.A} sideName="A Side" />
+                  {chapter.B.Completed == "true" ? <Sides side={chapter.A} sideName="B Side" /> : null}
+                  {chapter.C.Completed == "true" ? <Sides side={chapter.A} sideName="C Side" /> : null}
+                </>
+              )}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+};
 
 /**
  * * Returns to HTML code formatted well
@@ -196,80 +268,29 @@ function generateHTMLForSides(side: ChapterStats["A"], sideName: string) {
 
 const Pretty: FC<{ KVP: HandleData }> = (props) => {
   const { KVP: stats } = props;
-  const outputDiv = useMemo(() => document.getElementById("output"), []);
-  if (outputDiv == null) return; // Nowhere to put output
+  const [openChapters, setOpenChapters] = useState<readonly string[]>([]);
 
-  outputDiv.innerHTML = ""; // Clear the output before replacing it
-  const important = stats.important;
-  const importantKVP = Object.entries(important);
-
-  const importantFieldset = document.createElement("fieldset");
-  importantFieldset.innerHTML = `<legend>Total Statistics</legend>`;
-
-  const OneToFour = importantKVP.splice(0, 4); //* Name, Time, Deaths, Strawbs
-  const FiveToEight = importantKVP.splice(0, 4); //* Golden Strawbs, Jumps, Wall Jumps, Dashes
-
-  const div1 = document.createElement("div"); // The first line of stats
-  div1.style = "display:flex;";
-  for (const KVP of OneToFour) {
-    div1.innerHTML += `<div style="margin:auto"><h3>${KVP[0]}</h3><p>${KVP[1]}</p></div>`;
-  }
-
-  const div2 = document.createElement("div"); // The second line of stats
-  div2.style = "display:flex;";
-  for (const KVP of FiveToEight) {
-    div2.innerHTML += `<div style="margin:auto"><h3>${KVP[0]}</h3><p>${KVP[1]}</p></div>`;
-  }
-
-  importantFieldset.appendChild(div1);
-  importantFieldset.appendChild(div2);
-  outputDiv.appendChild(importantFieldset);
-
-  stats.chapters.forEach((chapter) => {
-    console.log(chapter);
-
-    const chapterDiv = document.createElement("div");
-    chapterDiv.className = "chapterDiv";
-
-    let chapterHTML = `<h1 style='cursor:pointer;' onclick='toggle("${chapter.Chapter.replace(/ /g, "")}")'>${
-      chapter.Chapter
-    }</h1><div style='display:none;' id='${chapter.Chapter.replace(
-      / /g,
-      ""
-    )}'><div style='display:flex;justify-content: space-around;'>`;
-
-    if (chapter.B.HeartGem == "true") chapterHTML += "<img src='redHeart.png'/>";
-    if (chapter.A.HeartGem == "true") chapterHTML += "<img src='blueHeart.png'/>";
-    if (chapter.C.HeartGem == "true") chapterHTML += "<img src='goldHeart.png'/>";
-    chapterHTML += "</div>";
-
-    if (chapter.A.Completed !== "true") chapterDiv.innerHTML += `<p>${chapter.Chapter} not complete.</p>`;
-
-    let infoDiv = '<div class="info">';
-    const special = chapter.Chapter[0] !== "C"; // Check if the chapter is prologue or epilogue
-    if (!special) {
-      if (chapter.A.Completed == "true") {
-        infoDiv += generateHTMLForSides(chapter.A, "A Side");
-      } else {
-        infoDiv += `<p>${chapter.Chapter} not completed.</p>`;
-      }
-      if (chapter.B.Completed == "true") {
-        infoDiv += generateHTMLForSides(chapter.B, "B Side");
-      }
-      if (chapter.C.Completed == "true") {
-        infoDiv += generateHTMLForSides(chapter.C, "C Side");
-      }
-    } else {
-      infoDiv += generateHTMLForSides(chapter.A, chapter.Chapter);
-    }
-
-    chapterHTML += infoDiv;
-    chapterHTML += "</div>";
-    chapterDiv.innerHTML = chapterHTML;
-    outputDiv.appendChild(chapterDiv);
-  });
-
-  return <div dangerouslySetInnerHTML={{ __html: outputDiv.innerHTML }}></div>;
+  return (
+    <div>
+      <Character important={stats.important} />
+      {stats.chapters.map((chapter) => (
+        <Chapter
+          chapter={chapter}
+          open={openChapters.includes(chapter.Chapter)}
+          toggle={() => {
+            setOpenChapters((openChapters) => {
+              const index = openChapters.indexOf(chapter.Chapter);
+              if (index >= 0) {
+                return [...openChapters.slice(0, index), ...openChapters.slice(index + 1)];
+              } else {
+                return [...openChapters, chapter.Chapter];
+              }
+            });
+          }}
+        />
+      ))}
+    </div>
+  );
 };
 
 function App() {
