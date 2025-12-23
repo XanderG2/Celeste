@@ -1,21 +1,24 @@
-type CharacterStats = ReturnType<typeof characterStats>;
-type ChapterStats = ReturnType<typeof chapterStat>;
-type HandleData = ReturnType<typeof handle>;
-type SideStats = ReturnType<typeof getStats>;
+// @ts-check
+
+/** @typedef {ReturnType<typeof characterStats>} CharacterStats */
+/** @typedef {ReturnType<typeof chapterStat>} ChapterStats */
 
 /**
  * * Runs upon submission of a file
  * * Finds file, and passes it off to handle
+ * @returns {void}
  */
 
-function fileSubmit(): void {
-  const input = document.querySelector('input[type="file"]') as HTMLInputElement | null; // The Choose file button
+function fileSubmit() {
+  /** @type {HTMLInputElement | null} */
+  const input = document.querySelector('input[type="file"]'); // The Choose file button
 
   if (input == null) {
     console.error("Could not find input button!");
     return;
   }
 
+  /** @type {FileList | null} */
   const chosenFiles = input.files; // The user-selected file(s)
 
   if (chosenFiles == null) {
@@ -48,10 +51,10 @@ function fileSubmit(): void {
 
 /**
  * * Parses XML
- * @param contents - XML file as string
+ * @param {string} contents - XML file as string
  */
 
-function handle(contents: string) {
+function handle(contents) {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(contents, "text/xml");
 
@@ -63,9 +66,10 @@ function handle(contents: string) {
 
 /**
  * * converts input µs to formatted HH:MM:SS.MMM format
+ * @param {string|null} durationUStr
  */
 
-function µsToTime(durationUStr: string | null) {
+function µsToTime(durationUStr) {
   const durationU = durationUStr != null ? parseFloat(durationUStr) : 0;
   let duration = durationU / 10000;
   let milliseconds = duration % 1000;
@@ -83,10 +87,11 @@ function µsToTime(durationUStr: string | null) {
 
 /**
  * * Get character-related stats
- * @param xmlDoc - The XML document to parse
+ * @param {Document} xmlDoc - The XML document to parse
  */
-function characterStats(xmlDoc: Document) {
-  const v = (id: string) => {
+function characterStats(xmlDoc) {
+  /** @param {string} id */
+  const v = (id) => {
     const spaced = id.replace(/([A-Z])/g, " $1").trim();
 
     let val = xmlDoc.getElementsByTagName(id)[0].childNodes[0].nodeValue; // The value of the stat
@@ -114,8 +119,9 @@ function characterStats(xmlDoc: Document) {
 
 /**
  * * Get the stats of a side of a chapter
+ * @param {Element} side
  */
-function getStats(side: Element) {
+function getStats(side) {
   return {
     Strawberries: side.getAttribute("TotalStrawberries") ?? "",
     Completed: side.getAttribute("Completed") ?? "",
@@ -130,15 +136,20 @@ function getStats(side: Element) {
 
 /**
  * * Get chapter-related stats
+ * @param {Document} xmlDoc
  */
-function chapterStats(xmlDoc: Document) {
+function chapterStats(xmlDoc) {
   const areas = xmlDoc.getElementsByTagName("Areas")[0]; // Find the chapter tag in XML
   const allAreaStats = areas.getElementsByTagName("AreaStats"); // Find the statistics for all chapters
 
   return [...allAreaStats].map(chapterStat);
 }
 
-function chapterStat(areaStat: Element) {
+/**
+ *
+ * @param {Element} areaStat
+ */
+function chapterStat(areaStat) {
   let idAttribute = areaStat.getAttribute("ID");
   if (idAttribute == null) {
     console.error("idAttribute is null!");
@@ -169,9 +180,10 @@ function chapterStat(areaStat: Element) {
 
 /**
  * * Toggle a section
+ * @param {string} id
  */
 
-function toggle(id: string) {
+function toggle(id) {
   const el = document.getElementById(id);
   if (el == null) return;
   const prevStyle = el.style.cssText;
@@ -187,54 +199,21 @@ function toggle(id: string) {
 
 /**
  * * Self explanatory.
- * @param side
- * @param sideName - Either Prologue, Epilogue, A, B, or C
+ * @param {ChapterStats["A"]} side
+ * @param {string} sideName - Either Prologue, Epilogue, A, B, or C
  */
 
-function generateHTMLForSides(side: ChapterStats["A"], sideName: string) {
-  return /* HTML */ `<fieldset>
-      <legend>${sideName}</legend>
-      <div style="display:flex;">
-        <div style="margin:auto">
-          <h3>Deaths</h3>
-          ${side.Deaths}
-        </div>
-        <div style="margin:auto">
-          <h3>Heart Crystal?</h3>
-          ${side.HeartGem}
-        </div>
-        <div style="margin:auto">
-          <h3>Strawberries</h3>
-          ${side.Strawberries}
-        </div>
-        <div style="margin:auto">
-          <h3>Time</h3>
-          ${side.Time}
-        </div>
-      </div>
-      <div style="display:flex;">
-        <div style="margin:auto">
-          <h3>Best Deaths</h3>
-          ${side.BestDeaths}
-        </div>
-        <div style="margin:auto">
-          <h3>Best Time</h3>
-          ${side.BestTime}
-        </div>
-        <div style="margin:auto">
-          <h3>Best Dashes</h3>
-          ${side.BestDashes}
-        </div>
-      </div>
-    </fieldset>
-    <br />`;
+function generateHTMLForSides(side, sideName) {
+  return `<fieldset><legend>${sideName}</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${side.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${side.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${side.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${side.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${side.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${side.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${side.BestDashes}</div></div></fieldset><br/>`;
 }
 
 /**
  * * Returns to HTML code formatted well
+ * @param {{important: CharacterStats, chapters: ChapterStats[]}} stats
+ * @returns {void}
  */
 
-function pretty(stats: HandleData): void {
+function pretty(stats) {
   const outputDiv = document.getElementById("output");
   if (outputDiv == null) return; // Nowhere to put output
 
@@ -309,11 +288,3 @@ function pretty(stats: HandleData): void {
     outputDiv.appendChild(chapterDiv);
   });
 }
-
-window.addEventListener("DOMContentLoaded", () => {
-  const button = document.getElementById("submit");
-  console.log("pressed");
-  if (button) button.onclick = fileSubmit;
-});
-
-console.log("loaded");
