@@ -4,6 +4,15 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Celeste save file viewer</title>
+    <script type="importmap">
+      {
+        "imports": {
+          "react": "https://esm.sh/react@19.2.0",
+          "react-dom/client": "https://esm.sh/react-dom@19.2.0/client"
+        }
+      }
+    </script>
+    <script type="module" src="https://esm.sh/tsx"></script>
   </head>
   <body>
     <div>
@@ -15,9 +24,9 @@
         </i>
       </p>
       <input type="file" id="file" accept=".celeste" />
-      <button onclick="fileSubmit()">Submit</button>
+      <button id="submit">Submit</button>
     </div>
     <div id="output"></div>
-    <script src="script.js"></script>
+    <script src="script.tsx" type="text/tsx"></script>
   </body>
 </html>
