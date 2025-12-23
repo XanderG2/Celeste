@@ -12,21 +12,9 @@
         }
       }
     </script>
-    <script type="module" src="https://esm.sh/tsx"></script>
   </head>
   <body>
-    <div>
-      <h1>Upload a .celeste file to get started</h1>
-      <p>
-        <i style="color: grey">
-          .celeste files are usually located in the file path C:\Program Files
-          (x86)\Steam\steamapps\common\Celeste\Saves
-        </i>
-      </p>
-      <input type="file" id="file" accept=".celeste" />
-      <button id="submit">Submit</button>
-    </div>
-    <div id="output"></div>
-    <script src="script.tsx" type="text/tsx"></script>
+    <div id="root"></div>
+    <script src="script.js" type="module"></script>
   </body>
 </html>

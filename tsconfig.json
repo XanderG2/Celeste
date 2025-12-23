@@ -3,11 +3,11 @@
 
   "compilerOptions": {
     "lib": ["dom", "dom.iterable", "esnext"],
-    "module": "esnext",
+    "module": "preserve",
     "target": "es2022",
 
     "isolatedModules": true,
-    "jsx": "react-jsx",
+    "jsx": "react",
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "strict": true

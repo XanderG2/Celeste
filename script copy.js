@@ -1,17 +1,84 @@
+// @ts-check
 import { createRoot } from "react-dom/client";
-import React, { createElement as u, Fragment, useRef, useState, useMemo, FC } from "react";
+import { createElement as u, Fragment } from "react";
 
-type CharacterStats = ReturnType<typeof characterStats>;
-type ChapterStats = ReturnType<typeof chapterStat>;
-type HandleData = ReturnType<typeof handle>;
-type SideStats = ReturnType<typeof getStats>;
+const root = document.getElementById("root");
+
+function App() {
+  return u(Fragment, {}, [
+    u("div", {}, [
+      u("h1", {}, "Upload a .celeste file to get started"),
+      <p>
+        <i style="color: grey">
+          .celeste files are usually located in the file path C:\Program Files
+          (x86)\Steam\steamapps\common\Celeste\Saves
+        </i>
+      </p>,
+      u("input", {type: "file", id: "file", accept: ".celeste"}, "")
+      <input type="file" id="file" accept=".celeste" />,
+      <button onclick="fileSubmit()">Submit</button>,
+    ]),
+    u("div", { id: "output" }, ""),
+  ]);
+}
+
+createRoot(root).render(u("h1", {}, "Hello, World!"));
+
+/** @typedef {ReturnType<typeof characterStats>} CharacterStats */
+/** @typedef {ReturnType<typeof chapterStat>} ChapterStats */
+
+/**
+ * * Runs upon submission of a file
+ * * Finds file, and passes it off to handle
+ * @returns {void}
+ */
+
+function fileSubmit() {
+  /** @type {HTMLInputElement | null} */
+  const input = document.querySelector('input[type="file"]'); // The Choose file button
+
+  if (input == null) {
+    console.error("Could not find input button!");
+    return;
+  }
+
+  /** @type {FileList | null} */
+  const chosenFiles = input.files; // The user-selected file(s)
+
+  if (chosenFiles == null) {
+    console.error("No submitted file!"); // Can't read no files
+    return;
+  }
+
+  if (chosenFiles.length !== 1) {
+    console.error("Should be 1 file submitted!"); // Can't read 2 files
+    return;
+  }
+
+  const file = chosenFiles[0]; // There is only one file, so the file will always be the first item
+
+  const reader = new FileReader();
+  reader.onload = () => {
+    const contents = reader.result; // The contents of the file
+
+    if (typeof contents !== "string") {
+      console.error("Contents should be a string!");
+      return;
+    }
+
+    const KVP = handle(contents);
+    pretty(KVP); // Display on webpage
+  };
+
+  reader.readAsText(file);
+}
 
 /**
  * * Parses XML
- * @param contents - XML file as string
+ * @param {string} contents - XML file as string
  */
 
-function handle(contents: string) {
+function handle(contents) {
   const parser = new DOMParser();
   const xmlDoc = parser.parseFromString(contents, "text/xml");
 
@@ -23,9 +90,10 @@ function handle(contents: string) {
 
 /**
  * * converts input µs to formatted HH:MM:SS.MMM format
+ * @param {string|null} durationUStr
  */
 
-function µsToTime(durationUStr: string | null) {
+function µsToTime(durationUStr) {
   const durationU = durationUStr != null ? parseFloat(durationUStr) : 0;
   let duration = durationU / 10000;
   let milliseconds = duration % 1000;
@@ -43,10 +111,11 @@ function µsToTime(durationUStr: string | null) {
 
 /**
  * * Get character-related stats
- * @param xmlDoc - The XML document to parse
+ * @param {Document} xmlDoc - The XML document to parse
  */
-function characterStats(xmlDoc: Document) {
-  const v = (id: string) => {
+function characterStats(xmlDoc) {
+  /** @param {string} id */
+  const v = (id) => {
     const spaced = id.replace(/([A-Z])/g, " $1").trim();
 
     let val = xmlDoc.getElementsByTagName(id)[0].childNodes[0].nodeValue; // The value of the stat
@@ -74,8 +143,9 @@ function characterStats(xmlDoc: Document) {
 
 /**
  * * Get the stats of a side of a chapter
+ * @param {Element} side
  */
-function getStats(side: Element) {
+function getStats(side) {
   return {
     Strawberries: side.getAttribute("TotalStrawberries") ?? "",
     Completed: side.getAttribute("Completed") ?? "",
@@ -90,15 +160,20 @@ function getStats(side: Element) {
 
 /**
  * * Get chapter-related stats
+ * @param {Document} xmlDoc
  */
-function chapterStats(xmlDoc: Document) {
+function chapterStats(xmlDoc) {
   const areas = xmlDoc.getElementsByTagName("Areas")[0]; // Find the chapter tag in XML
   const allAreaStats = areas.getElementsByTagName("AreaStats"); // Find the statistics for all chapters
 
   return [...allAreaStats].map(chapterStat);
 }
 
-function chapterStat(areaStat: Element) {
+/**
+ *
+ * @param {Element} areaStat
+ */
+function chapterStat(areaStat) {
   let idAttribute = areaStat.getAttribute("ID");
   if (idAttribute == null) {
     console.error("idAttribute is null!");
@@ -129,9 +204,10 @@ function chapterStat(areaStat: Element) {
 
 /**
  * * Toggle a section
+ * @param {string} id
  */
 
-function toggle(id: string) {
+function toggle(id) {
   const el = document.getElementById(id);
   if (el == null) return;
   const prevStyle = el.style.cssText;
@@ -147,59 +223,26 @@ function toggle(id: string) {
 
 /**
  * * Self explanatory.
- * @param side
- * @param sideName - Either Prologue, Epilogue, A, B, or C
+ * @param {ChapterStats["A"]} side
+ * @param {string} sideName - Either Prologue, Epilogue, A, B, or C
  */
 
-function generateHTMLForSides(side: ChapterStats["A"], sideName: string) {
-  return /* HTML */ `<fieldset>
-      <legend>${sideName}</legend>
-      <div style="display:flex;">
-        <div style="margin:auto">
-          <h3>Deaths</h3>
-          ${side.Deaths}
-        </div>
-        <div style="margin:auto">
-          <h3>Heart Crystal?</h3>
-          ${side.HeartGem}
-        </div>
-        <div style="margin:auto">
-          <h3>Strawberries</h3>
-          ${side.Strawberries}
-        </div>
-        <div style="margin:auto">
-          <h3>Time</h3>
-          ${side.Time}
-        </div>
-      </div>
-      <div style="display:flex;">
-        <div style="margin:auto">
-          <h3>Best Deaths</h3>
-          ${side.BestDeaths}
-        </div>
-        <div style="margin:auto">
-          <h3>Best Time</h3>
-          ${side.BestTime}
-        </div>
-        <div style="margin:auto">
-          <h3>Best Dashes</h3>
-          ${side.BestDashes}
-        </div>
-      </div>
-    </fieldset>
-    <br />`;
+function generateHTMLForSides(side, sideName) {
+  return `<fieldset><legend>${sideName}</legend><div style='display:flex;'><div style="margin:auto"><h3>Deaths</h3>${side.Deaths}</div><div style="margin:auto"><h3>Heart Crystal?</h3>${side.HeartGem}</div><div style="margin:auto"><h3>Strawberries</h3>${side.Strawberries}</div><div style="margin:auto"><h3>Time</h3>${side.Time}</div></div><div style='display:flex;'><div style="margin:auto"><h3>Best Deaths</h3>${side.BestDeaths}</div><div style="margin:auto"><h3>Best Time</h3>${side.BestTime}</div><div style="margin:auto"><h3>Best Dashes</h3>${side.BestDashes}</div></div></fieldset><br/>`;
 }
 
 /**
  * * Returns to HTML code formatted well
+ * @param {{important: CharacterStats, chapters: ChapterStats[]}} stats
+ * @returns {void}
  */
 
-const Pretty: FC<{ KVP: HandleData }> = (props) => {
-  const { KVP: stats } = props;
-  const outputDiv = useMemo(() => document.getElementById("output"), []);
+function pretty(stats) {
+  const outputDiv = document.getElementById("output");
   if (outputDiv == null) return; // Nowhere to put output
 
   outputDiv.innerHTML = ""; // Clear the output before replacing it
+
   const important = stats.important;
   const importantKVP = Object.entries(important);
 
@@ -268,95 +311,4 @@ const Pretty: FC<{ KVP: HandleData }> = (props) => {
     chapterDiv.innerHTML = chapterHTML;
     outputDiv.appendChild(chapterDiv);
   });
-
-  return <div dangerouslySetInnerHTML={{ __html: outputDiv.innerHTML }}></div>;
-};
-
-function App() {
-  const fileInputRef = useRef<HTMLInputElement | null>(null);
-
-  const [KVP, setKVP] = useState<HandleData | null>(null);
-
-  /**
-   * * Runs upon submission of a file
-   * * Finds file, and passes it off to handle
-   */
-  function fileSubmit(): void {
-    const input = fileInputRef.current;
-
-    if (input == null) {
-      console.error("Could not find input button!");
-      return;
-    }
-
-    const chosenFiles = input.files; // The user-selected file(s)
-
-    if (chosenFiles == null) {
-      console.error("No submitted file!"); // Can't read no files
-      return;
-    }
-
-    if (chosenFiles.length !== 1) {
-      console.error("Should be 1 file submitted!"); // Can't read 2 files
-      return;
-    }
-
-    const file = chosenFiles[0]; // There is only one file, so the file will always be the first item
-
-    const reader = new FileReader();
-    reader.onload = () => {
-      const contents = reader.result; // The contents of the file
-
-      if (typeof contents !== "string") {
-        console.error("Contents should be a string!");
-        return;
-      }
-
-      const KVP = handle(contents);
-      setKVP(KVP);
-      //pretty(KVP); // Display on webpage
-    };
-
-    reader.readAsText(file);
-  }
-
-  const restart = () => {
-    setKVP(null);
-  };
-
-  if (KVP) {
-    return (
-      <div>
-        <button onClick={restart}>Restart</button>
-        <br />
-        <Pretty KVP={KVP} />
-      </div>
-    );
-  }
-
-  return (
-    <>
-      <div>
-        <h1>Upload a .celeste file to get started</h1>
-        <p>
-          <i style={{ color: "grey" }}>
-            .celeste files are usually located in the file path C:\Program Files
-            (x86)\Steam\steamapps\common\Celeste\Saves
-          </i>
-        </p>
-        <input type="file" ref={fileInputRef} accept=".celeste" />
-        <button id="submit" onClick={fileSubmit}>
-          Submit
-        </button>
-      </div>
-      <div id="output"></div>
-    </>
-  );
 }
-window.addEventListener("DOMContentLoaded", () => {
-  const root = document.getElementById("root");
-  if (!root) throw new Error("No root element");
-  createRoot(root).render(<App />);
-});
-
-console.log("loaded");
