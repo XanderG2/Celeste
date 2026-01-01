@@ -164,10 +164,15 @@ const Sides: FC<{ side: ChapterStats["A"]; sideName: string }> = ({ side, sideNa
           <h3>Heart Crystal?</h3>
           {side.HeartGem}
         </div>
-        <div style={{ margin: "auto" }}>
-          <h3>Strawberries</h3>
-          {side.Strawberries}
-        </div>
+        {sideName === "A Side" ? (
+          <div style={{ margin: "auto" }}>
+            <h3>Strawberries</h3>
+            {side.Strawberries}
+          </div>
+        ) : (
+          <></>
+        )}
+
         <div style={{ margin: "auto" }}>
           <h3>Time</h3>
           {side.Time}
@@ -250,8 +255,8 @@ const Chapter: FC<{ chapter: ChapterStats; open: boolean; toggle: () => void }> 
               ) : (
                 <>
                   <Sides side={chapter.A} sideName="A Side" />
-                  {chapter.B.Completed == "true" ? <Sides side={chapter.A} sideName="B Side" /> : null}
-                  {chapter.C.Completed == "true" ? <Sides side={chapter.A} sideName="C Side" /> : null}
+                  {chapter.B.Completed == "true" ? <Sides side={chapter.B} sideName="B Side" /> : null}
+                  {chapter.C.Completed == "true" ? <Sides side={chapter.C} sideName="C Side" /> : null}
                 </>
               )}
             </div>

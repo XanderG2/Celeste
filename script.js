@@ -132,9 +132,9 @@ const Sides = ({ side, sideName }) => {
             React.createElement("div", { style: { margin: "auto" } },
                 React.createElement("h3", null, "Heart Crystal?"),
                 side.HeartGem),
-            React.createElement("div", { style: { margin: "auto" } },
+            sideName === "A Side" ? (React.createElement("div", { style: { margin: "auto" } },
                 React.createElement("h3", null, "Strawberries"),
-                side.Strawberries),
+                side.Strawberries)) : (React.createElement(React.Fragment, null)),
             React.createElement("div", { style: { margin: "auto" } },
                 React.createElement("h3", null, "Time"),
                 side.Time)),
@@ -184,8 +184,8 @@ const Chapter = ({ chapter, open, toggle }) => {
                 chapter.Chapter,
                 " not complete.")) : (React.createElement("div", { className: "info" }, special ? (React.createElement(Sides, { side: chapter.A, sideName: chapter.Chapter })) : (React.createElement(React.Fragment, null,
                 React.createElement(Sides, { side: chapter.A, sideName: "A Side" }),
-                chapter.B.Completed == "true" ? React.createElement(Sides, { side: chapter.A, sideName: "B Side" }) : null,
-                chapter.C.Completed == "true" ? React.createElement(Sides, { side: chapter.A, sideName: "C Side" }) : null))))))));
+                chapter.B.Completed == "true" ? React.createElement(Sides, { side: chapter.B, sideName: "B Side" }) : null,
+                chapter.C.Completed == "true" ? React.createElement(Sides, { side: chapter.C, sideName: "C Side" }) : null))))))));
 };
 /**
  * * Returns to HTML code formatted well
