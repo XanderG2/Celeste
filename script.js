@@ -134,7 +134,7 @@ const Sides = ({ side, sideName }) => {
                 side.HeartGem),
             sideName === "A Side" ? (React.createElement("div", { style: { margin: "auto" } },
                 React.createElement("h3", null, "Strawberries"),
-                side.Strawberries)) : (React.createElement(React.Fragment, null)),
+                side.Strawberries)) : null,
             React.createElement("div", { style: { margin: "auto" } },
                 React.createElement("h3", null, "Time"),
                 side.Time)),

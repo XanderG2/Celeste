@@ -169,9 +169,7 @@ const Sides: FC<{ side: ChapterStats["A"]; sideName: string }> = ({ side, sideNa
             <h3>Strawberries</h3>
             {side.Strawberries}
           </div>
-        ) : (
-          <></>
-        )}
+        ) : null}
 
         <div style={{ margin: "auto" }}>
           <h3>Time</h3>
